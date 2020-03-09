@@ -28,8 +28,6 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#include "portISR_CONTEXT.h"
-
 /*-----------------------------------------------------------
  * Application specific definitions.
  *
@@ -44,9 +42,9 @@
 
 #define configCLINT_BASE_ADDRESS		MTIME_CTRL_ADDR
 #define configUSE_PREEMPTION			1
-#define configUSE_IDLE_HOOK				0
-#define configUSE_TICK_HOOK				0
-#define configCPU_CLOCK_HZ				( MTIME_RATE_HZ ) 
+#define configUSE_IDLE_HOOK			0
+#define configUSE_TICK_HOOK			0
+#define configCPU_CLOCK_HZ			( MTIME_RATE_HZ ) 
 /* 
  * configTICK_RATE_HZ indicate the frequency in HZ of the Tick.
  * On some CPU having a configTICK_RATE_HZ too high could induce scheduling time consuption
@@ -56,21 +54,35 @@
  */
 #define configTICK_RATE_HZ			( ( TickType_t ) 100 )
 #define configMAX_PRIORITIES			( 7 )
-#define configMINIMAL_STACK_SIZE		( ( size_t ) 128 + PORT_CONTEXT_lastIDX )
-#define configAPPLICATION_ALLOCATED_HEAP 0
-#define configTOTAL_HEAP_SIZE          ( ( size_t ) 8192 )
+/*
+ * configMINIMAL_STACK_SIZE must be a value greater than the stack use by 
+ * the minimal task + the sizeof the register saved.
+ * The size of the register is differrent from a core to another, e.g. on RiscV
+ * it could be 32 base register + 32 register for FPU and some other for the
+ * specific extensions.
+ */
+#define configMINIMAL_STACK_SIZE		( ( size_t ) 164 )
+
+/*
+ * ucHeap buffer is defined by the application and store into section .heap with freedom metal
+ * so configAPPLICATION_ALLOCATED_HEAP must be set to 1
+ */
+#define configAPPLICATION_ALLOCATED_HEAP 	1
+
+#define configTOTAL_HEAP_SIZE          		( ( size_t ) 8192 )
+
 #define configMAX_TASK_NAME_LEN			( 16 )
 #define configUSE_TRACE_FACILITY		1
 #define configUSE_16_BIT_TICKS			0
 #define configIDLE_SHOULD_YIELD			0
-#define configUSE_MUTEXES				1
+#define configUSE_MUTEXES			1
 #define configQUEUE_REGISTRY_SIZE		8
-#define configCHECK_FOR_STACK_OVERFLOW	2
+#define configCHECK_FOR_STACK_OVERFLOW		2
 #define configUSE_RECURSIVE_MUTEXES		1
-#define configUSE_MALLOC_FAILED_HOOK	1
-#define configUSE_APPLICATION_TASK_TAG	0
-#define configUSE_COUNTING_SEMAPHORES	1
-#define configGENERATE_RUN_TIME_STATS	0
+#define configUSE_MALLOC_FAILED_HOOK		1
+#define configUSE_APPLICATION_TASK_TAG		0
+#define configUSE_COUNTING_SEMAPHORES		1
+#define configGENERATE_RUN_TIME_STATS		0
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
 
 /**************************************************************
@@ -84,14 +96,19 @@
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 			0
-#define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
+#define configMAX_CO_ROUTINE_PRIORITIES 	( 2 )
 
-/* Software timer definitions. SwitchC*/
-#define configUSE_TIMERS				1
+/* Software timer definitions. SwitchC */
+#define configUSE_TIMERS			1
 #define configTIMER_TASK_PRIORITY		( configMAX_PRIORITIES - 1 )
 #define configTIMER_QUEUE_LENGTH		4
-/* Minimal value for configTIMER_TASK_STACK_DEPTH is 80 + PORT_CONTEXT_lastIDX  to avoid stack overflow */
-#define configTIMER_TASK_STACK_DEPTH	( 100 + PORT_CONTEXT_lastIDX )
+/*
+ * configTIMER_TASK_STACK_DEPTH must be a value greater than 80 + the sizeof the register saved.
+ * The size of the register is differrent from a core to another, e.g. on RiscV
+ * it could be 32 base register + 32 register for FPU and some other for the
+ * specific extensions.
+ */
+#define configTIMER_TASK_STACK_DEPTH		( 114 )
 
 /* Task priorities.  Allow these to be overridden. */
 #ifndef uartPRIMARY_PRIORITY
@@ -102,26 +119,26 @@
 to exclude the API function. */
 #define INCLUDE_vTaskPrioritySet		1
 #define INCLUDE_uxTaskPriorityGet		1
-#define INCLUDE_vTaskDelete				1
-#define INCLUDE_vTaskCleanUpResources	1
+#define INCLUDE_vTaskDelete			1
+#define INCLUDE_vTaskCleanUpResources		1
 #define INCLUDE_vTaskSuspend			1
 #define INCLUDE_vTaskDelayUntil			1
-#define INCLUDE_vTaskDelay				1
+#define INCLUDE_vTaskDelay			1
 #define INCLUDE_eTaskGetState			1
-#define INCLUDE_xTimerPendFunctionCall	1
+#define INCLUDE_xTimerPendFunctionCall		1
 
 
 /* Overwrite some of the stack sizes allocated to various test and demo tasks.
 Like all task stack sizes, the value is the number of words, not bytes. */
-#define bktBLOCK_TIME_TASK_STACK_SIZE 100
-#define notifyNOTIFIED_TASK_STACK_SIZE 120
-#define priSUSPENDED_RX_TASK_STACK_SIZE 90
-#define tmrTIMER_TEST_TASK_STACK_SIZE 100
-#define ebRENDESVOUS_TEST_TASK_STACK_SIZE 100
-#define ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE 115
-#define genqMUTEX_TEST_TASK_STACK_SIZE 90
-#define genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE 100
-#define recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE 90
+#define bktBLOCK_TIME_TASK_STACK_SIZE 			100
+#define notifyNOTIFIED_TASK_STACK_SIZE 			120
+#define priSUSPENDED_RX_TASK_STACK_SIZE 		90
+#define tmrTIMER_TEST_TASK_STACK_SIZE 			100
+#define ebRENDESVOUS_TEST_TASK_STACK_SIZE 		100
+#define ebEVENT_GROUP_SET_BITS_TEST_TASK_STACK_SIZE 	115
+#define genqMUTEX_TEST_TASK_STACK_SIZE 			90
+#define genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE 		100
+#define recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE 	90
 
 /* Just in case it was not defined above force to not use it */
 #ifndef configUSE_SEGGER_SYSTEMVIEW
