@@ -148,7 +148,9 @@ Like all task stack sizes, the value is the number of words, not bytes. */
 #endif
 
 #if( configUSE_SEGGER_SYSTEMVIEW == 1 )
-# include <SEGGER_SYSVIEW_FreeRTOS.h>
+# ifndef __ASSEMBLY__
+#  include <SEGGER_SYSVIEW_FreeRTOS.h>
+# endif
 # if (INCLUDE_xTaskGetIdleTaskHandle != 1)
 #  define INCLUDE_xTaskGetIdleTaskHandle  1
 # endif
