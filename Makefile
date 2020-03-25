@@ -112,13 +112,13 @@ $(BUILD_DIRECTORIES):
 # ----------------------------------------------------------------------
 # Compile Object Files From Assembly
 # ----------------------------------------------------------------------
-$(OBJ_DIR)/%.o: %.S
+$(OBJ_DIR)/%.o: %.S libfreertos libSystemView
 	$(HIDE)$(CC) -D__ASSEMBLY__ -c -o $@ $(ASFLAGS) $(CFLAGS) $<
 
 # ----------------------------------------------------------------------
 # Compile Object Files From C
 # ----------------------------------------------------------------------
-$(OBJ_DIR)/%.o: %.c
+$(OBJ_DIR)/%.o: %.c libfreertos libSystemView
 	$(HIDE)$(CC) -c -o $@ $(CFLAGS) $<
 
 directories: $(BUILD_DIRECTORIES)
