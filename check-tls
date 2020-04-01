@@ -1,0 +1,12 @@
+#!/bin/sh
+for i in "$@"; do
+	nm $i | awk '/__tls_size/ { size = strtonum("0x" $1);}
+	             /__tls_alloc/ { alloc = strtonum("0x" $1); }
+		     END {
+			if (alloc < size) {
+				printf("ERROR: TLS allocation incorrect: allocate 0x%x require 0x%x\n", alloc, size);
+				printf("Place this in FreeRTOSConfig.h:\n");
+				printf("\t#define configTLS_STATIC_SIZE 0x%x\n", size);
+				exit(1);
+			}}'
+done	

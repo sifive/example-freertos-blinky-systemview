@@ -61,7 +61,7 @@
  * it could be 32 base register + 32 register for FPU and some other for the
  * specific extensions.
  */
-#define configMINIMAL_STACK_SIZE		( ( size_t ) 164 )
+#define configMINIMAL_STACK_SIZE		( ( size_t ) 512 )
 
 /*
  * ucHeap buffer is defined by the application and store into section .heap with freedom metal
@@ -92,7 +92,16 @@
  * http://www.nadler.com/embedded/newlibAndFreeRTOS.html
  * in order to mitigate it the following define must be set to 1
  **************************************************************/ 
+#ifdef _PICOLIBC__
+#define configUSE_PICOLIBC_TLS			1
+#if __LONG_WIDTH__ == 32
+#define configTLS_STATIC_SIZE			0x194	/* have to specify at compile time, can discover after link time */
+#elif __LONG_WIDTH__ == 64
+#define configTLS_STATIC_SIZE			0x324	/* have to specify at compile time, can discover after link time */
+#endif
+#else
 #define configUSE_NEWLIB_REENTRANT 		1 
+#endif
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 			0
