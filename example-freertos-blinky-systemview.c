@@ -100,7 +100,7 @@ int main( void )
 	const char * const pcMessageEnd = "FreeRTOS Demo end\r\n";
 
 	prvSetupHardware();
-	write( STDOUT_FILENO, pcMessage, strlen( pcMessage ) );
+	fputs( pcMessage, stdout );
 
 	/* Create the queue. */
 	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( uint32_t ) );
@@ -131,7 +131,7 @@ int main( void )
 		vTaskDelete( xHandle_ReceiveTask );
 	}
 
-	write( STDOUT_FILENO, pcMessageEnd, strlen( pcMessageEnd ) );
+	fputs( pcMessageEnd, stdout );
 
 }
 /*-----------------------------------------------------------*/
@@ -194,7 +194,7 @@ static void prvQueueReceiveTask( void *pvParameters )
 		is it the expected value?  If it is, toggle the LED. */
 		if( ulReceivedValue == ulExpectedValue )
 		{
-			write( STDOUT_FILENO, pcPassMessage, strlen( pcPassMessage ) );
+			fputs( pcPassMessage, stdout );
 			ulReceivedValue = 0U;
 
 			if ( led0_green != NULL ) 
@@ -205,7 +205,7 @@ static void prvQueueReceiveTask( void *pvParameters )
 		}
 		else
 		{
-			write( STDOUT_FILENO, pcFailMessage, strlen( pcFailMessage ) );
+			fputs( pcFailMessage, stdout );
 		}
 	}
 }
@@ -221,7 +221,7 @@ static void prvSetupHardware( void )
 	led0_blue = metal_led_get_rgb("LD0", "blue");
 	if ((led0_red == NULL) || (led0_green == NULL) || (led0_blue == NULL))
 	{
-		write( STDOUT_FILENO, pcWarningMsg, strlen( pcWarningMsg ) );
+		fputs( pcWarningMsg, stdout );
 	}
 	else
 	{
@@ -287,8 +287,8 @@ void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
 	function is called if a stack overflow is detected. */
 	taskDISABLE_INTERRUPTS();
 
-	write( STDOUT_FILENO, "ERROR Stack overflow on func: ", 30 );
-	write( STDOUT_FILENO, pcTaskName, strlen( pcTaskName ) );
+	fputs( "ERROR Stack overflow on func: ", stdout );
+	fputs( pcTaskName, stdout );
 
 
    if ( led0_red != NULL )
