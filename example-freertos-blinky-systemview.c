@@ -42,8 +42,7 @@
 #include "queue.h"
 
 /* Freedom metal includes. */
-#include <metal/machine.h>
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #include <metal/lock.h>
 #include <metal/uart.h>
@@ -86,11 +85,21 @@ static void prvQueueSendTask( void *pvParameters );
 /* The queue used by both tasks. */
 static QueueHandle_t xQueue = NULL;
 
-struct metal_cpu *cpu0;
-struct metal_interrupt *cpu_intr, *tmr_intr;
-struct metal_led *led0_red, *led0_green, *led0_blue;
+#ifndef metal_led_ld0_red
+#define metal_led_ld0_red metal_led_none
+#endif
 
-#define LED_ERROR ((led0_red == NULL) || (led0_green == NULL) || (led0_blue == NULL))
+#ifndef metal_led_ld0_green
+#define metal_led_ld0_green metal_led_none
+#endif
+
+#ifndef metal_led_ld0_blue
+#define metal_led_ld0_blue metal_led_none
+#endif
+
+#define led0_red metal_led_ld0_red
+#define led0_green metal_led_ld0_green
+#define led0_blue metal_led_ld0_blue
 
 /*-----------------------------------------------------------*/
 int main( void )
@@ -153,11 +162,8 @@ static void prvQueueSendTask( void *pvParameters )
 	/* For automation test process we limite the number of message to send to 5 then we exit the program */
 	for( i=0 ; i<5 ; i++)
 	{
-		if ( led0_green != NULL ) 
-		{
-			/* Switch off the Green led */
+	        /* Switch off the Green led */
         	metal_led_on(led0_green);
-		}
 
 		/* Place this task in the blocked state until it is time to run again. */
 		vTaskDelayUntil( &xNextWakeTime, mainQUEUE_TICK_COUNT_FOR_1S );
@@ -197,11 +203,8 @@ static void prvQueueReceiveTask( void *pvParameters )
 			write( STDOUT_FILENO, pcPassMessage, strlen( pcPassMessage ) );
 			ulReceivedValue = 0U;
 
-			if ( led0_green != NULL ) 
-			{
-				/* Switch on the Green led */
-				metal_led_off(led0_green);
-			}
+			/* Switch on the Green led */
+			metal_led_off(led0_green);
 		}
 		else
 		{
@@ -216,25 +219,15 @@ static void prvSetupHardware( void )
 	const char * const pcWarningMsg = "At least one of LEDs is null.\n";
 
 	// This demo will toggle LEDs colors so we define them here
-	led0_red = metal_led_get_rgb("LD0", "red");
-	led0_green = metal_led_get_rgb("LD0", "green");
-	led0_blue = metal_led_get_rgb("LD0", "blue");
-	if ((led0_red == NULL) || (led0_green == NULL) || (led0_blue == NULL))
-	{
-		write( STDOUT_FILENO, pcWarningMsg, strlen( pcWarningMsg ) );
-	}
-	else
-	{
-		// Enable each LED
-		metal_led_enable(led0_red);
-		metal_led_enable(led0_green);
-		metal_led_enable(led0_blue);
+	// Enable each LED
+	metal_led_enable(led0_red);
+	metal_led_enable(led0_green);
+	metal_led_enable(led0_blue);
 
-		// All Off
-		metal_led_on(led0_red);
-		metal_led_on(led0_green);
-		metal_led_on(led0_blue);
-	}
+	// All Off
+	metal_led_on(led0_red);
+	metal_led_on(led0_green);
+	metal_led_on(led0_blue);
 }
 /*-----------------------------------------------------------*/
 
@@ -253,11 +246,8 @@ void vApplicationMallocFailedHook( void )
 	provide information on how the remaining heap might be fragmented). */
 	taskDISABLE_INTERRUPTS();
 
-   if ( led0_red != NULL )
-   {
-		// Red light on
-		metal_led_off(led0_red);
-	}
+        // Red light on
+	metal_led_off(led0_red);
 
 	_exit(1);
 }
@@ -291,11 +281,8 @@ void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
 	write( STDOUT_FILENO, pcTaskName, strlen( pcTaskName ) );
 
 
-   if ( led0_red != NULL )
-   {
-		// Red light on
-		metal_led_off(led0_red);
-	}
+	// Red light on
+	metal_led_off(led0_red);
 
 	_exit(1);
 }
@@ -311,11 +298,8 @@ void vAssertCalled( void )
 {
 	taskDISABLE_INTERRUPTS();
 
-   if ( led0_red != NULL )
-   {
-		// Red light on
-		metal_led_off(led0_red);
-	}
+	// Red light on
+	metal_led_off(led0_red);
 
 	_exit(1);
 }
