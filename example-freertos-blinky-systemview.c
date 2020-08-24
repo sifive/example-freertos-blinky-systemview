@@ -216,8 +216,6 @@ static void prvQueueReceiveTask( void *pvParameters )
 
 static void prvSetupHardware( void )
 {
-	const char * const pcWarningMsg = "At least one of LEDs is null.\n";
-
 	// This demo will toggle LEDs colors so we define them here
 	// Enable each LED
 	metal_led_enable(led0_red);
